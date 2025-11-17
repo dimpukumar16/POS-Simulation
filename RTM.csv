@@ -1,0 +1,50 @@
+Requirement ID,Requirement Description,Module/File,Test Case ID,Status
+POS-F-001,Product scanning by barcode,routes/products.py:get_product_by_barcode,TC-001,Implemented
+POS-F-002,Manual product entry,routes/cart.py:add_to_cart,TC-002,Implemented
+POS-F-003,Stock availability validation,models/product.py:is_in_stock,TC-003,Implemented
+POS-F-004,Inventory update after sale,routes/checkout.py:process_checkout,TC-004,Implemented
+POS-F-005,Product CRUD operations,routes/products.py,TC-005,Implemented
+POS-F-006,Add items to cart,routes/cart.py:add_to_cart,TC-006,Implemented
+POS-F-007,Remove items from cart,routes/cart.py:remove_from_cart,TC-007,Implemented
+POS-F-008,Update cart quantities,routes/cart.py:update_cart_item,TC-008,Implemented
+POS-F-009,Calculate subtotal dynamically,routes/cart.py:calculate_cart_totals,TC-009,Implemented
+POS-F-010,Display running total,routes/cart.py:get_cart,TC-010,Implemented
+POS-F-011,Item-level discounts,routes/cart.py:add_to_cart,TC-011,Implemented
+POS-F-012,Order-level discounts,routes/cart.py:apply_discount,TC-012,Implemented
+POS-F-013,Apply configurable tax rates,models/product.py:calculate_price_with_tax,TC-013,Implemented
+POS-F-014,Manager override for high discounts,routes/cart.py:apply_discount,TC-014,Implemented
+POS-F-015,Mock payment methods (Cash/Card/UPI),utils/payment_simulator.py,TC-015,Implemented
+POS-F-016,Simulate payment responses,utils/payment_simulator.py:process_payment,TC-016,Implemented
+POS-F-017,Record sale transactions,routes/checkout.py:process_checkout,TC-017,Implemented
+POS-F-018,Generate PDF receipt,utils/pdf_generator.py:generate_receipt,TC-018,Implemented
+POS-F-019,Include store info on receipt,utils/pdf_generator.py:STORE_INFO,TC-019,Implemented
+POS-F-020,Auto-save receipts,routes/checkout.py:process_checkout,TC-020,Implemented
+POS-F-021,Process refunds,routes/checkout.py:process_refund,TC-021,Implemented
+POS-F-022,Void transactions,routes/checkout.py:void_transaction,TC-022,Implemented
+POS-F-023,Manager authorization for refunds,routes/checkout.py:process_refund,TC-023,Implemented
+POS-F-024,Generate daily sales reports,routes/reports.py:get_sales_report,TC-024,Implemented
+POS-F-025,Generate inventory reports,routes/reports.py:get_inventory_report,TC-025,Implemented
+POS-F-026,Filter reports by date,routes/reports.py:get_sales_report,TC-026,Implemented
+POS-F-027,Filter reports by cashier,routes/reports.py:get_sales_report,TC-027,Implemented
+POS-F-028,Search sales history,routes/reports.py:get_sales_history,TC-028,Implemented
+POS-F-029,Export reports (PDF/CSV),routes/reports.py:export_report,TC-029,Implemented
+POS-F-030,User authentication,routes/auth.py:login,TC-030,Implemented
+POS-F-031,Login via username/password,routes/auth.py:login,TC-031,Implemented
+POS-F-032,Login via PIN,routes/auth.py:login,TC-032,Implemented
+POS-F-033,Role-Based Access Control,routes/auth.py + decorators,TC-033,Implemented
+POS-F-034,Cashier permissions,models/user.py:has_permission,TC-034,Implemented
+POS-F-035,Manager permissions,models/user.py:has_permission,TC-035,Implemented
+POS-F-036,Administrator permissions,models/user.py:has_permission,TC-036,Implemented
+POS-F-037,Encrypt user credentials,models/user.py:set_password,TC-037,Implemented
+POS-F-038,Log failed login attempts,routes/auth.py:login,TC-038,Implemented
+POS-F-039,User-friendly error messages,All routes,TC-039,Implemented
+POS-NF-001,Checkout completion ≤ 2 seconds,routes/checkout.py,TC-100,Implemented
+POS-NF-002,99% availability,app.py + health check,TC-101,Implemented
+POS-NF-003,Data consistency,models + transactions,TC-102,Implemented
+POS-NF-004,Audit logging,utils/logger.py,TC-103,Implemented
+POS-NF-005,Simple and intuitive UI,frontend/,TC-104,Pending
+POS-SR-001,Enforce RBAC,routes/products.py:require_role,TC-105,Implemented
+POS-SR-002,Encrypt credentials,models/user.py:set_password,TC-106,Implemented
+POS-SR-003,Restrict sensitive operations,routes/checkout.py,TC-107,Implemented
+POS-SR-004,Manager authorization,routes/auth.py:verify_pin,TC-108,Implemented
+POS-SR-005,Audit trail with timestamps,models/inventory.py:AuditLog,TC-109,Implemented
