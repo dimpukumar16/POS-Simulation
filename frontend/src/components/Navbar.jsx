@@ -32,7 +32,7 @@ function Navbar({ user, onLogout }) {
             >
               Transactions
             </button>
-            {(user?.role === 'manager' || user?.role === 'administrator') && (
+            {user?.role === 'manager' && (
               <button
                 onClick={() => navigate('/refunds')}
                 className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md transition-colors"

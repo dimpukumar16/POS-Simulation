@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import Navbar from '../components/Navbar'
 import Loading from '../components/Loading'
 import ManagerOverride from '../components/ManagerOverride'
-import { getTransactions } from '../api/checkout'
-import { getRefunds, createRefund } from '../api/refunds'
+import { getTransactions, processRefund as processRefundAPI } from '../api/checkout'
+import { getRefunds } from '../api/refunds'
 import { verifyPin } from '../api/auth'
 import { handleApiError } from '../api/config'
 
@@ -29,8 +29,11 @@ function Refunds({ user, onLogout }) {
   const loadRefundHistory = async () => {
     try {
       setLoading(true)
-      const data = await getRefunds()
-      setRefunds(data.refunds || [])
+      // Get transactions with type='refund'
+      const data = await getTransactions({ limit: 100 })
+      // Filter for refund transactions
+      const refundTransactions = data.transactions?.filter(tx => tx.transaction_type === 'refund') || []
+      setRefunds(refundTransactions)
     } catch (err) {
       setError(handleApiError(err))
     } finally {
@@ -90,34 +93,30 @@ function Refunds({ user, onLogout }) {
 
     const amountCents = Math.round(parseFloat(refundAmount || selectedTransaction.total_amount) * 100)
     
-    setPendingRefund({
+    const refundData = {
       transactionId: selectedTransaction.id,
       reason: refundReason,
       amount_cents: amountCents
-    })
+    }
+
+    setPendingRefund(refundData)
 
     // Check if user has manager/admin role
     if (user.role === 'manager' || user.role === 'administrator') {
-      // User already has permission, proceed
-      processRefund({
-        transactionId: selectedTransaction.id,
-        reason: refundReason,
-        amount_cents: amountCents
-      })
+      // Manager/Admin can use their own PIN
+      // Show override modal to get their PIN
+      setShowOverride(true)
     } else {
-      // Require manager override
+      // Cashier requires manager override
       setShowOverride(true)
     }
   }
 
   const handleManagerAuthorize = async (pin) => {
     try {
-      const response = await verifyPin(pin, `Refund transaction ${selectedTransaction.transaction_number}`)
-      setOverrideToken(response.override_token)
-      
-      // Process the pending refund
+      // Process the pending refund with manager PIN
       if (pendingRefund) {
-        await processRefund(pendingRefund, response.override_token)
+        await processRefund(pendingRefund, pin)
       }
       
       setShowOverride(false)
@@ -126,17 +125,19 @@ function Refunds({ user, onLogout }) {
     }
   }
 
-  const processRefund = async (refundData, authToken = null) => {
+  const processRefund = async (refundData, managerPin = null) => {
     try {
       setProcessing(true)
       setError('')
 
-      const response = await createRefund(refundData.transactionId, {
-        reason: refundData.reason,
-        amount_cents: refundData.amount_cents
-      })
+      // Use the checkout refund endpoint which expects manager_pin
+      const response = await processRefundAPI(
+        refundData.transactionId,
+        refundData.reason,
+        managerPin || user.pin // Use manager PIN from override or current user's PIN
+      )
 
-      alert(`✅ Refund Processed Successfully!\n\nRefund Number: ${response.refund.refund_number}\nAmount: $${response.refund.amount.toFixed(2)}\n\nInventory has been restocked.`)
+      alert(`✅ Refund Processed Successfully!\n\nTransaction: ${response.refund_transaction.transaction_number}\nAmount: $${Math.abs(response.refund_transaction.total_amount).toFixed(2)}\n\nInventory has been restocked.`)
 
       // Reset form
       setSelectedTransaction(null)
@@ -359,16 +360,16 @@ function Refunds({ user, onLogout }) {
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Refund #
+                            Transaction #
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Transaction #
+                            Reason
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Amount
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Refunded By
+                            Processed By
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Date
@@ -382,16 +383,16 @@ function Refunds({ user, onLogout }) {
                         {refunds.map((refund) => (
                           <tr key={refund.id} className="hover:bg-gray-50">
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {refund.refund_number}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {refund.transaction_number}
                             </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {refund.refund_reason || 'N/A'}
+                            </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">
-                              ${refund.amount.toFixed(2)}
+                              ${Math.abs(refund.total_amount).toFixed(2)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {refund.refunded_by_name || 'Unknown'}
+                              {refund.cashier_name || 'Unknown'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {new Date(refund.created_at).toLocaleString()}

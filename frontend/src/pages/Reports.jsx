@@ -20,12 +20,14 @@ function Reports({ user, onLogout }) {
       if (reportType === 'sales') {
         const start = startDate || new Date().toISOString().split('T')[0]
         const end = endDate || new Date().toISOString().split('T')[0]
-        const data = await getSalesReport(start, end)
-        setSalesData(data)
+        const response = await getSalesReport(start, end)
+        // Backend returns data wrapped in 'report' key
+        setSalesData(response.report || response)
         setInventoryData(null)
       } else if (reportType === 'inventory') {
-        const data = await getInventoryReport()
-        setInventoryData(data)
+        const response = await getInventoryReport()
+        // Backend returns data wrapped in 'report' key
+        setInventoryData(response.report || response)
         setSalesData(null)
       }
     } catch (err) {
@@ -107,51 +109,66 @@ function Reports({ user, onLogout }) {
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Total Sales</p>
+                <p className="text-sm text-gray-600 mb-1">Net Sales</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  ${salesData.summary?.total_sales || 0}
+                  ${salesData.summary?.net_sales?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div className="bg-green-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600 mb-1">Total Transactions</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {salesData.summary?.total_transactions || 0}
+                  {salesData.summary?.sales_count || 0}
                 </p>
               </div>
               <div className="bg-purple-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Average Sale</p>
+                <p className="text-sm text-gray-600 mb-1">Average Transaction</p>
                 <p className="text-2xl font-bold text-purple-600">
-                  ${salesData.summary?.average_sale || 0}
+                  ${salesData.summary?.average_transaction?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div className="bg-orange-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Items Sold</p>
+                <p className="text-sm text-gray-600 mb-1">Total Refunds</p>
                 <p className="text-2xl font-bold text-orange-600">
-                  {salesData.summary?.items_sold || 0}
+                  ${salesData.summary?.total_refunds?.toFixed(2) || '0.00'}
                 </p>
               </div>
             </div>
 
-            {salesData.transactions?.length > 0 && (
+            {/* Payment Methods */}
+            {salesData.payment_methods && Object.keys(salesData.payment_methods).length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-bold mb-3">Payment Methods</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {Object.entries(salesData.payment_methods).map(([method, data]) => (
+                    <div key={method} className="bg-gray-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600 capitalize">{method}</p>
+                      <p className="text-xl font-bold">${data.total?.toFixed(2)}</p>
+                      <p className="text-xs text-gray-500">{data.count} transactions</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Top Products */}
+            {salesData.top_products?.length > 0 && (
               <div>
-                <h3 className="font-bold mb-3">Recent Transactions</h3>
+                <h3 className="font-bold mb-3">Top Products</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Transaction #</th>
-                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Date</th>
-                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Payment</th>
-                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Total</th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Product</th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Quantity Sold</th>
+                        <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Revenue</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {salesData.transactions.map(tx => (
-                        <tr key={tx.id} className="hover:bg-gray-50">
-                          <td className="px-4 py-2 text-sm font-mono">{tx.transaction_number}</td>
-                          <td className="px-4 py-2 text-sm">{new Date(tx.created_at).toLocaleString()}</td>
-                          <td className="px-4 py-2 text-sm capitalize">{tx.payment_method}</td>
-                          <td className="px-4 py-2 text-sm font-bold text-green-600">${tx.total_amount}</td>
+                      {salesData.top_products.slice(0, 10).map((product, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50">
+                          <td className="px-4 py-2 text-sm font-semibold">{product.name}</td>
+                          <td className="px-4 py-2 text-sm">{product.quantity}</td>
+                          <td className="px-4 py-2 text-sm font-bold text-green-600">${product.revenue?.toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -167,7 +184,7 @@ function Reports({ user, onLogout }) {
           <div className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-2xl font-bold mb-6">Inventory Report</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-blue-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600 mb-1">Total Products</p>
                 <p className="text-2xl font-bold text-blue-600">
@@ -175,15 +192,21 @@ function Reports({ user, onLogout }) {
                 </p>
               </div>
               <div className="bg-green-50 p-4 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Total Stock Value</p>
+                <p className="text-sm text-gray-600 mb-1">Total Inventory Value</p>
                 <p className="text-2xl font-bold text-green-600">
-                  ${inventoryData.summary?.total_value || 0}
+                  ${inventoryData.summary?.total_inventory_value?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div className="bg-orange-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600 mb-1">Low Stock Items</p>
                 <p className="text-2xl font-bold text-orange-600">
-                  {inventoryData.summary?.low_stock_count || 0}
+                  {inventoryData.summary?.low_stock_items || 0}
+                </p>
+              </div>
+              <div className="bg-red-50 p-4 rounded-lg">
+                <p className="text-sm text-gray-600 mb-1">Out of Stock</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {inventoryData.summary?.out_of_stock_items || 0}
                 </p>
               </div>
             </div>
@@ -195,6 +218,7 @@ function Reports({ user, onLogout }) {
                     <tr>
                       <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Product</th>
                       <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Barcode</th>
+                      <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Category</th>
                       <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Stock</th>
                       <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Reorder Level</th>
                       <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">Price</th>
@@ -206,15 +230,20 @@ function Reports({ user, onLogout }) {
                       <tr key={product.id} className="hover:bg-gray-50">
                         <td className="px-4 py-2 text-sm font-semibold">{product.name}</td>
                         <td className="px-4 py-2 text-sm font-mono">{product.barcode}</td>
+                        <td className="px-4 py-2 text-sm">{product.category || 'N/A'}</td>
                         <td className="px-4 py-2 text-sm">
                           <span className={product.stock_quantity <= product.reorder_level ? 'text-orange-600 font-semibold' : ''}>
                             {product.stock_quantity}
                           </span>
                         </td>
                         <td className="px-4 py-2 text-sm">{product.reorder_level}</td>
-                        <td className="px-4 py-2 text-sm font-bold text-green-600">${product.price}</td>
+                        <td className="px-4 py-2 text-sm font-bold text-green-600">${product.price?.toFixed(2)}</td>
                         <td className="px-4 py-2 text-sm">
-                          {product.stock_quantity <= product.reorder_level ? (
+                          {product.stock_quantity === 0 ? (
+                            <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold">
+                              Out of Stock
+                            </span>
+                          ) : product.stock_quantity <= product.reorder_level ? (
                             <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-semibold">
                               Low Stock
                             </span>
