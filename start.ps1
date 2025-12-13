@@ -45,7 +45,7 @@ Write-Host "✓ Dependencies installed" -ForegroundColor Green
 # Initialize database
 Write-Host ""
 Write-Host "Initializing database..." -ForegroundColor Yellow
-cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
+cd backend
 python -m utils.db
 cd ..
 Write-Host "✓ Database initialized" -ForegroundColor Green
@@ -67,5 +67,5 @@ Write-Host ""
 Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
 Write-Host ""
 
-cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
+cd backend
 python app.py
