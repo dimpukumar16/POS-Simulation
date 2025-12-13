@@ -14,7 +14,7 @@ Before you begin, ensure you have the following installed:
 
 1. **Navigate to the project directory:**
    ```powershell
-   cd C:\Users\naikm\OneDrive\Desktop\pos_simulator
+   cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation"
    ```
 
 2. **Create a Python virtual environment:**
@@ -39,7 +39,7 @@ Before you begin, ensure you have the following installed:
 
 5. **Initialize the database:**
    ```powershell
-   cd backend
+   cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
    python -m utils.db
    ```
 
@@ -54,7 +54,7 @@ Before you begin, ensure you have the following installed:
 
 1. **Open a new terminal and navigate to the frontend directory:**
    ```powershell
-   cd C:\Users\naikm\OneDrive\Desktop\pos_simulator\frontend
+   cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
    ```
 
 2. **Install Node.js dependencies:**
@@ -76,7 +76,7 @@ You can test the backend using curl, Postman, or the included test suite.
 ### Run Automated Tests
 
 ```powershell
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 pytest tests/ -v
 ```
 
@@ -204,7 +204,7 @@ The database is seeded with 10 sample products:
 ## 🗂️ Project Structure
 
 ```
-pos_simulator/
+POS-Simulation/
 │
 ├── backend/
 │   ├── app.py              # Main Flask application
@@ -262,7 +262,7 @@ Generated reports and receipts are saved in the `receipts/` directory as PDF fil
 If you encounter database errors, reset the database:
 
 ```powershell
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 python -c "from utils.db import reset_database; from app import app; reset_database(app)"
 ```
 
@@ -289,7 +289,7 @@ The system is designed to complete checkout operations in ≤ 2 seconds for 90% 
 To test performance:
 
 ```powershell
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 pytest tests/ -v --durations=10
 ```
 

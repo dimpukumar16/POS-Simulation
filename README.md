@@ -71,7 +71,7 @@ pip install -r requirements.txt
 
 2. Initialize the database:
 ```bash
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 python -m utils.db
 ```
 
@@ -86,7 +86,7 @@ The backend will run on `http://localhost:5000`
 
 1. Navigate to the frontend directory:
 ```bash
-cd frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 ```
 
 2. Install dependencies:
@@ -114,13 +114,13 @@ Or manually in separate terminals:
 
 **Terminal 1 (Backend):**
 ```powershell
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 python app.py
 ```
 
 **Terminal 2 (Frontend):**
 ```powershell
-cd frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 npm run dev
 ```
 
@@ -139,7 +139,7 @@ The system comes with pre-configured test users:
 ## 🔹 Project Structure
 
 ```
-pos_simulator/
+POS-Simulation/
 │
 ├── backend/
 │   ├── app.py                  # Main Flask application
@@ -204,7 +204,7 @@ pos_simulator/
 Run the test suite:
 
 ```bash
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 pytest tests/ -v --cov
 ```
 

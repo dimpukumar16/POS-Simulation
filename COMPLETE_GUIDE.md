@@ -43,7 +43,7 @@
 ### Method 1: Automatic Startup (Recommended)
 
 ```powershell
-cd C:\Users\naikm\OneDrive\Desktop\pos_simulator
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation"
 .\start-full.ps1
 ```
 
@@ -58,13 +58,13 @@ This script will:
 
 **Terminal 1 - Backend:**
 ```powershell
-cd C:\Users\naikm\OneDrive\Desktop\pos_simulator\backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 python app.py
 ```
 
 **Terminal 2 - Frontend:**
 ```powershell
-cd C:\Users\naikm\OneDrive\Desktop\pos_simulator\frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 npm run dev
 ```
 
@@ -74,18 +74,18 @@ If it's your first time or you need to reinstall:
 
 ```powershell
 # 1. Install frontend dependencies
-cd C:\Users\naikm\OneDrive\Desktop\pos_simulator\frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 npm install
 
 # 2. Initialize database (if not done)
-cd ..\backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 python init_db.py
 
 # 3. Start backend
 python app.py
 
 # 4. In new terminal, start frontend
-cd ..\frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 npm run dev
 ```
 
@@ -206,7 +206,7 @@ npm run dev
 ## 📁 PROJECT STRUCTURE
 
 ```
-pos_simulator/
+POS-Simulation/
 ├── backend/                    # Python Flask Backend
 │   ├── app.py                 # Main application
 │   ├── init_db.py             # Database initializer
@@ -301,7 +301,7 @@ Invoke-RestMethod -Uri http://localhost:5000/api/cart/add -Method POST -Headers 
 ### Problem: Frontend won't start
 **Solution:**
 ```powershell
-cd frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 Remove-Item -Recurse -Force node_modules
 npm install
 npm run dev
@@ -310,7 +310,7 @@ npm run dev
 ### Problem: Backend errors
 **Solution:**
 ```powershell
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 python init_db.py
 python app.py
 ```
@@ -331,7 +331,7 @@ Stop-Process -Name node -Force
 ### Problem: Database errors
 **Solution:**
 ```powershell
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 Remove-Item database\pos.db
 python init_db.py
 ```

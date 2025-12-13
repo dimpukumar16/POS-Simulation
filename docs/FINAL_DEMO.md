@@ -433,14 +433,14 @@ A full-stack web application with:
 ### Development Environment
 ```bash
 # Backend
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 python -m venv venv
 venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 python app.py  # Runs on http://localhost:5000
 
 # Frontend
-cd frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 npm install
 npm run dev  # Runs on http://localhost:5173
 ```

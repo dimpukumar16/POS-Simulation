@@ -379,14 +379,14 @@ This plan covers all testing activities for the POS Simulator including:
 **Local Development:**
 ```bash
 # Backend
-cd backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 python app.py
 
 # Frontend
-cd frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 npm install
 npm run dev
 ```

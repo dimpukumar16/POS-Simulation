@@ -3,7 +3,7 @@
 ## Quickest Way (One Command)
 
 ### Option 1: Double-Click to Run
-Simply **double-click** on `RUN.ps1` in the pos_simulator folder!
+Simply **double-click** on `RUN.ps1` in the POS-Simulation folder!
 
 This will:
 - ✅ Start the backend server (port 5000)
@@ -14,7 +14,7 @@ This will:
 
 ### Option 2: Run from PowerShell
 ```powershell
-cd C:\Users\naikm\OneDrive\Desktop\pos_simulator
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation"
 .\RUN.ps1
 ```
 
@@ -26,7 +26,7 @@ cd C:\Users\naikm\OneDrive\Desktop\pos_simulator
 
 Open a PowerShell terminal and run:
 ```powershell
-cd C:\Users\naikm\OneDrive\Desktop\pos_simulator\backend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\backend"
 python app.py
 ```
 
@@ -44,7 +44,7 @@ You should see:
 
 Open a **NEW** PowerShell terminal and run:
 ```powershell
-cd C:\Users\naikm\OneDrive\Desktop\pos_simulator\frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 npm run dev
 ```
 
@@ -128,7 +128,7 @@ Should show: v18 or higher
 
 If packages aren't installed:
 ```powershell
-cd frontend
+cd "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation\frontend"
 npm install
 ```
 

@@ -6,7 +6,7 @@ Write-Host "  🏪 POS SIMULATOR - COMPLETE SYSTEM STARTUP" -ForegroundColor Cya
 Write-Host "=" * 70 -ForegroundColor Cyan
 Write-Host ""
 
-$baseDir = "C:\Users\naikm\OneDrive\Desktop\pos_simulator"
+$baseDir = "c:\Users\Narayana S\Desktop\projects\pos simulator\POS-Simulation"
 $backendDir = Join-Path $baseDir "backend"
 $frontendDir = Join-Path $baseDir "frontend"
 
