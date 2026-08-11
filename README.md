@@ -50,15 +50,31 @@ See [DOCKER_GUIDE.md](DOCKER_GUIDE.md) for details.
 - **[HOW_TO_RUN.md](HOW_TO_RUN.md)** - Local development setup
 - **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** - Common issues and solutions
 
-## �🔹 Tech Stack
+## 🔹 Tech Stack
 
 - **Backend**: Python 3.11 + Flask + SQLAlchemy
 - **Database**: PostgreSQL (production) / SQLite (development)
 - **Frontend**: React 18 + Vite + TailwindCSS
 - **Authentication**: JWT + Refresh Tokens
 - **PDF Generation**: ReportLab
-- **Testing**: Pytest (backend), Jest (frontend)
+- **Testing**: Pytest (backend), ESLint (frontend quality check)
 - **DevOps**: Docker + Docker Compose, GitHub Actions
+
+## ⚙️ Environment Configuration
+
+Before running the application locally, make sure to configure the environment:
+
+1. **Backend Configuration (`backend/.env`)**:
+   ```env
+   SECRET_KEY=pos-secret-key-change-in-production
+   JWT_SECRET_KEY=jwt-secret-key-change-in-production
+   DEBUG=True
+   PORT=5000
+   ```
+2. **Frontend Configuration (`frontend/.env`)**:
+   ```env
+   VITE_API_URL=http://localhost:5000/api
+   ```
 
 ## 🔹 Installation
 
@@ -201,35 +217,48 @@ pos_simulator/
 
 ## 🔹 Testing
 
-Run the test suite:
-
+### Backend Unit Tests
+Run the pytest test suite in the virtual environment to verify backend logic:
 ```bash
-cd backend
-pytest tests/ -v --cov
+# From workspace root
+venv\Scripts\python.exe -m pytest backend/tests -v
+```
+
+### Backend Linting
+Verify backend compliance with PEP 8 and check for unused imports:
+```bash
+venv\Scripts\flake8 backend --select=F401,F841 --exclude=venv
+```
+
+### Frontend Linting
+Verify frontend quality rules and check for any syntax/formatting issues:
+```bash
+cd frontend
+npm run lint
 ```
 
 ## 🔹 Performance Requirements
 
 - Checkout operations complete in ≤ 2 seconds (90% of cases)
-- 99% availability in lab usage conditions
-- Absolute data consistency between sales and inventory
+- 99% availability in production usage conditions
+- Absolute transactional data consistency between sales and inventory
 
 ## 🔹 Security Features
 
 - Password encryption using bcrypt
-- JWT-based authentication
-- Role-Based Access Control (RBAC)
-- Audit logging for all operations
-- Manager override for sensitive operations
+- Secure JWT-based authentication with refresh token rotation
+- Role-Based Access Control (RBAC) (Cashier, Manager, Administrator roles)
+- Audit logging for all critical system operations
+- Manager override authentication (PIN verification) for refunds and voids
 
 ## 🔹 Requirements Traceability
 
-See `RTM.csv` for complete mapping of requirements to code modules and test cases.
+See `RTM.csv` for the mapping of functional requirements to code implementation and test coverage.
 
 ## 🔹 License
 
-Educational project for Software Engineering course.
+Educational Open Source project for Software Engineering.
 
 ## 🔹 Authors
 
-- Team: 802, 803, 179, 171
+- POS Simulator Contributors
