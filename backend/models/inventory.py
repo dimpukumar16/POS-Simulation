@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from models.user import db
 
 
@@ -14,7 +14,7 @@ class AuditLog(db.Model):
     details = db.Column(db.Text, nullable=True)
     ip_address = db.Column(db.String(50), nullable=True)
     status = db.Column(db.String(20), default='success')  # 'success', 'failed'
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), index=True)
     
     # Relationships
     user = db.relationship('User', back_populates='audit_logs')
@@ -49,7 +49,7 @@ class InventoryLog(db.Model):
     reference_type = db.Column(db.String(50), nullable=True)  # 'transaction', 'manual'
     reference_id = db.Column(db.Integer, nullable=True)
     notes = db.Column(db.Text, nullable=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), index=True)
     
     # Relationships
     product = db.relationship('Product')

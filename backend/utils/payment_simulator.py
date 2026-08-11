@@ -1,6 +1,6 @@
 import random
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class PaymentSimulator:
@@ -40,7 +40,7 @@ class PaymentSimulator:
                 'status': 'failed',
                 'message': f'Invalid payment method: {payment_method}',
                 'reference': None,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
             }
         
         # Validate amount
@@ -50,7 +50,7 @@ class PaymentSimulator:
                 'status': 'failed',
                 'message': 'Invalid payment amount',
                 'reference': None,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
             }
         
         # Simulate processing time
@@ -72,7 +72,7 @@ class PaymentSimulator:
                 'message': f'{payment_method.upper()} payment successful',
                 'reference': reference,
                 'amount': amount,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
             }
         else:
             # Generate appropriate error message
@@ -83,7 +83,7 @@ class PaymentSimulator:
                 'message': error_message,
                 'reference': reference,
                 'amount': amount,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
             }
     
     @staticmethod
@@ -104,7 +104,7 @@ class PaymentSimulator:
                 'status': 'failed',
                 'message': f'Insufficient payment. Required: ${total_amount:.2f}, Paid: ${amount_paid:.2f}',
                 'reference': None,
-                'timestamp': datetime.utcnow().isoformat()
+                'timestamp': datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
             }
         
         change = amount_paid - total_amount
@@ -118,7 +118,7 @@ class PaymentSimulator:
             'amount': total_amount,
             'amount_paid': amount_paid,
             'change': round(change, 2),
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
         }
     
     @staticmethod
@@ -147,13 +147,13 @@ class PaymentSimulator:
             'reference': refund_reference,
             'original_reference': original_reference,
             'amount': amount,
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
         }
     
     @staticmethod
     def _generate_reference(payment_method):
         """Generate a unique payment reference"""
-        timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+        timestamp = datetime.now(timezone.utc).replace(tzinfo=None).strftime('%Y%m%d%H%M%S')
         random_suffix = ''.join([str(random.randint(0, 9)) for _ in range(6)])
         
         prefixes = {

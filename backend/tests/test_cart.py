@@ -1,5 +1,4 @@
-import pytest
-from test_auth import client, get_auth_headers
+from test_auth import get_auth_headers
 
 
 def test_add_to_cart(client):

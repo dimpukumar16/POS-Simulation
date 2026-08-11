@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from models.user import db
 from models.inventory import AuditLog
 
@@ -30,7 +30,7 @@ class AuditLogger:
                 details=details,
                 ip_address=ip_address,
                 status=status,
-                timestamp=datetime.utcnow()
+                timestamp=datetime.now(timezone.utc).replace(tzinfo=None)
             )
             db.session.add(log_entry)
             db.session.commit()
@@ -113,7 +113,7 @@ class AuditLogger:
     def get_failed_login_attempts(username, hours=24):
         """Get failed login attempts for a user within specified hours"""
         from datetime import timedelta
-        cutoff_time = datetime.utcnow() - timedelta(hours=hours)
+        cutoff_time = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(hours=hours)
         
         logs = AuditLog.query.filter(
             AuditLog.action == 'login',

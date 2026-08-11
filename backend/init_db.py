@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 # Now we can import
 from app import app
-from models.user import db, User
+from models.user import User
 from utils.db import seed_database
 
 if __name__ == '__main__':

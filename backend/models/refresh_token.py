@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from models.user import db
 import secrets
 
@@ -12,7 +12,7 @@ class RefreshToken(db.Model):
     token = db.Column(db.String(255), unique=True, nullable=False, index=True)
     expires_at = db.Column(db.DateTime, nullable=False, index=True)
     is_revoked = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     last_used_at = db.Column(db.DateTime, nullable=True)
     ip_address = db.Column(db.String(50), nullable=True)
     user_agent = db.Column(db.String(255), nullable=True)
@@ -31,7 +31,7 @@ class RefreshToken(db.Model):
         token = RefreshToken(
             user_id=user_id,
             token=RefreshToken.generate_token(),
-            expires_at=datetime.utcnow() + timedelta(days=expires_days),
+            expires_at=datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=expires_days),
             ip_address=ip_address,
             user_agent=user_agent
         )
@@ -39,7 +39,7 @@ class RefreshToken(db.Model):
     
     def is_valid(self):
         """Check if token is valid (not expired and not revoked)"""
-        return not self.is_revoked and self.expires_at > datetime.utcnow()
+        return not self.is_revoked and self.expires_at > datetime.now(timezone.utc).replace(tzinfo=None)
     
     def revoke(self):
         """Revoke this token"""
@@ -47,7 +47,7 @@ class RefreshToken(db.Model):
     
     def update_last_used(self):
         """Update last used timestamp"""
-        self.last_used_at = datetime.utcnow()
+        self.last_used_at = datetime.now(timezone.utc).replace(tzinfo=None)
     
     def to_dict(self):
         """Convert refresh token to dictionary"""

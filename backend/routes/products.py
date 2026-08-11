@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from models.user import db, User
+from models.user import db
 from models.product import Product
 from models.inventory import InventoryLog
 from utils.logger import AuditLogger
@@ -90,7 +90,7 @@ def get_product_by_barcode(barcode):
 def get_product_by_id(product_id):
     """Get product by ID"""
     try:
-        product = Product.query.get(product_id)
+        product = db.session.get(Product, product_id)
         
         if not product:
             return jsonify({'error': 'Product not found'}), 404
@@ -161,7 +161,7 @@ def update_product(product_id):
     """Update product (Admin/Manager only)"""
     try:
         user_id = int(get_jwt_identity())
-        product = Product.query.get(product_id)
+        product = db.session.get(Product, product_id)
         
         if not product:
             return jsonify({'error': 'Product not found'}), 404
@@ -231,7 +231,7 @@ def delete_product(product_id):
     """Delete product (Admin only)"""
     try:
         user_id = int(get_jwt_identity())
-        product = Product.query.get(product_id)
+        product = db.session.get(Product, product_id)
         
         if not product:
             return jsonify({'error': 'Product not found'}), 404

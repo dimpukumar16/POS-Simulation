@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from models.user import db, User
 from models.refresh_token import RefreshToken
 from models.settings import Setting
@@ -84,7 +84,7 @@ def login():
         
         # Successful login
         user.failed_login_attempts = 0
-        user.last_login = datetime.utcnow()
+        user.last_login = datetime.now(timezone.utc).replace(tzinfo=None)
         db.session.commit()
         
         # Log successful login
@@ -209,7 +209,7 @@ def get_current_user():
     """Get current user information"""
     try:
         user_id = int(get_jwt_identity())
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         
         if not user:
             return jsonify({'error': 'User not found'}), 404
@@ -234,7 +234,7 @@ def change_password():
         if not current_password or not new_password:
             return jsonify({'error': 'Current and new password are required'}), 400
         
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         
         if not user:
             return jsonify({'error': 'User not found'}), 404
@@ -291,7 +291,7 @@ def refresh():
             return jsonify({'error': 'Refresh token expired or revoked'}), 401
         
         # Get user
-        user = User.query.get(refresh_token.user_id)
+        user = db.session.get(User, refresh_token.user_id)
         
         if not user or not user.is_active:
             return jsonify({'error': 'User not found or inactive'}), 401

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from models.user import db
 
 
@@ -14,7 +14,7 @@ class Refund(db.Model):
     reason = db.Column(db.Text, nullable=True)
     refund_method = db.Column(db.String(20), nullable=True)  # 'cash', 'card', 'original_method'
     status = db.Column(db.String(20), default='pending')  # 'pending', 'completed', 'failed'
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), index=True)
     completed_at = db.Column(db.DateTime, nullable=True)
     
     # Relationships

@@ -3,12 +3,9 @@ import Navbar from '../components/Navbar'
 import Loading from '../components/Loading'
 import ManagerOverride from '../components/ManagerOverride'
 import { getTransactions, processRefund as processRefundAPI } from '../api/checkout'
-import { getRefunds } from '../api/refunds'
-import { verifyPin } from '../api/auth'
 import { handleApiError } from '../api/config'
 
 function Refunds({ user, onLogout }) {
-  const [transactions, setTransactions] = useState([])
   const [refunds, setRefunds] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -19,7 +16,6 @@ function Refunds({ user, onLogout }) {
   const [processing, setProcessing] = useState(false)
   const [showOverride, setShowOverride] = useState(false)
   const [pendingRefund, setPendingRefund] = useState(null)
-  const [overrideToken, setOverrideToken] = useState(null)
   const [activeTab, setActiveTab] = useState('search') // 'search' or 'history'
 
   useEffect(() => {

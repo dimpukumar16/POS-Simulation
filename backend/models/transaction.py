@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from models.user import db
 
 
@@ -26,7 +26,7 @@ class Transaction(db.Model):
     change_given = db.Column(db.Float, default=0.0)
     
     # Metadata
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     completed_at = db.Column(db.DateTime, nullable=True)
     refund_reason = db.Column(db.Text, nullable=True)
     authorized_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # For refunds/voids

@@ -1,12 +1,7 @@
 import os
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from models.user import db, User
 from models.product import Product
-from models.transaction import Transaction, TransactionItem
-from models.inventory import AuditLog, InventoryLog
-from models.refund import Refund
-from models.refresh_token import RefreshToken
 from models.settings import Setting, DEFAULT_SETTINGS
 
 
@@ -17,7 +12,7 @@ def init_db(app):
     with app.app_context():
         # Create all tables
         db.create_all()
-        print("✓ Database tables created successfully")
+        print("[OK] Database tables created successfully")
 
 
 def seed_database(app):
@@ -25,10 +20,10 @@ def seed_database(app):
     with app.app_context():
         # Check if data already exists
         if User.query.first():
-            print("⚠ Database already contains data. Skipping seed.")
+            print("[WARNING] Database already contains data. Skipping seed.")
             return
         
-        print("🌱 Seeding database...")
+        print("[SEED] Seeding database...")
         
         # Create default users
         users = [
@@ -77,7 +72,7 @@ def seed_database(app):
             user.set_password(user_data['password'])
             db.session.add(user)
         
-        print("✓ Created default users")
+        print("[OK] Created default users")
         
         # Create sample products
         products = [
@@ -197,7 +192,7 @@ def seed_database(app):
             product = Product(**product_data)
             db.session.add(product)
         
-        print("✓ Created sample products")
+        print("[OK] Created sample products")
         
         # Create default settings
         for setting_data in DEFAULT_SETTINGS:
@@ -210,20 +205,20 @@ def seed_database(app):
             setting.set_value(setting_data['value'])
             db.session.add(setting)
         
-        print("✓ Created default settings")
+        print("[OK] Created default settings")
         
         # Commit all changes
         db.session.commit()
-        print("✅ Database seeding completed successfully!")
+        print("[SUCCESS] Database seeding completed successfully!")
 
 
 def reset_database(app):
     """Drop and recreate all tables"""
     with app.app_context():
         db.drop_all()
-        print("✓ Dropped all tables")
+        print("[OK] Dropped all tables")
         db.create_all()
-        print("✓ Recreated all tables")
+        print("[OK] Recreated all tables")
         seed_database(app)
 
 

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from models.user import db
 
 
@@ -17,8 +17,8 @@ class Product(db.Model):
     reorder_level = db.Column(db.Integer, default=10)
     tax_rate = db.Column(db.Float, default=0.0)  # Tax rate as decimal (e.g., 0.18 for 18%)
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     
     # Relationships
     transaction_items = db.relationship('TransactionItem', back_populates='product', lazy='dynamic')

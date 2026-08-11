@@ -1,8 +1,8 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.user import db
 from models.product import Product
-from datetime import datetime
+from datetime import datetime, timezone
 
 cart_bp = Blueprint('cart', __name__, url_prefix='/api/cart')
 
@@ -22,7 +22,7 @@ def get_user_cart(user_id):
         carts[cart_key] = {
             'items': [],
             'discount': {'type': None, 'amount': 0},
-            'created_at': datetime.utcnow().isoformat()
+            'created_at': datetime.now(timezone.utc).isoformat()
         }
     return carts[cart_key]
 
@@ -32,7 +32,7 @@ def calculate_cart_totals(cart):
     items = cart['items']
     discount = cart['discount']
     
-    subtotal = sum(item['line_total'] for item in items)
+    subtotal = sum(item['line_subtotal'] for item in items)
     
     # Apply discount
     discount_amount = 0
@@ -212,7 +212,7 @@ def update_cart_item():
             cart['items'] = [i for i in cart['items'] if i['cart_item_id'] != cart_item_id]
         else:
             # Check stock
-            product = Product.query.get(item['product_id'])
+            product = db.session.get(Product, item['product_id'])
             if not product.is_in_stock(quantity):
                 return jsonify({
                     'error': 'Insufficient stock',

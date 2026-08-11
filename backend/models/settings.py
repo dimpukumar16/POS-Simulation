@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from models.user import db
 import json
 
@@ -15,8 +15,8 @@ class Setting(db.Model):
     category = db.Column(db.String(50), nullable=True)  # 'tax', 'security', 'payment', 'general'
     is_public = db.Column(db.Boolean, default=False)  # Can be read without authentication
     updated_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     
     # Relationships
     updated_by_user = db.relationship('User', foreign_keys=[updated_by])
@@ -76,7 +76,7 @@ class Setting(db.Model):
         
         setting.set_value(value)
         setting.updated_by = user_id
-        setting.updated_at = datetime.utcnow()
+        setting.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
         
         return setting
     

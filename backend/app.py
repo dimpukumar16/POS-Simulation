@@ -150,11 +150,11 @@ if __name__ == '__main__':
     debug = os.environ.get('DEBUG', 'True').lower() == 'true'
     
     print("\n" + "="*60)
-    print("🚀 POS Simulator Backend Starting...")
+    print("POS Simulator Backend Starting...")
     print("="*60)
-    print(f"📍 Server: http://localhost:{port}")
-    print(f"📁 Database: {app.config['SQLALCHEMY_DATABASE_URI']}")
-    print(f"🔧 Debug Mode: {debug}")
+    print(f"Server: http://localhost:{port}")
+    print(f"Database: {app.config['SQLALCHEMY_DATABASE_URI']}")
+    print(f"Debug Mode: {debug}")
     print("="*60 + "\n")
     
     app.run(host='0.0.0.0', port=port, debug=debug)

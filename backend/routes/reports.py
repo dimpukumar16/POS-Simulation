@@ -1,10 +1,9 @@
-from flask import Blueprint, request, jsonify, send_file
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime, timedelta
-from models.user import db
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
+from datetime import datetime, timezone
 from models.transaction import Transaction
 from models.product import Product
-from models.inventory import InventoryLog, AuditLog
+from models.inventory import AuditLog
 from utils.pdf_generator import PDFGenerator
 import csv
 import os
@@ -33,12 +32,12 @@ def get_sales_report():
         
         # Default to today if not provided
         if not start_date_str:
-            start_date = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+            start_date = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).replace(tzinfo=None)
         else:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
         
         if not end_date_str:
-            end_date = datetime.utcnow()
+            end_date = datetime.now(timezone.utc).replace(tzinfo=None)
         else:
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').replace(hour=23, minute=59, second=59)
         
@@ -289,8 +288,8 @@ def export_report():
             start_date_str = data.get('start_date')
             end_date_str = data.get('end_date')
             
-            start_date = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else datetime.utcnow().replace(hour=0, minute=0, second=0)
-            end_date = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else datetime.utcnow()
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).replace(tzinfo=None)
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else datetime.now(timezone.utc).replace(tzinfo=None)
             
             transactions = Transaction.query.filter(
                 Transaction.created_at >= start_date,

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from datetime import datetime
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from datetime import datetime, timezone
 from models.user import db, User
 from models.product import Product
 from models.transaction import Transaction, TransactionItem
@@ -15,7 +15,7 @@ checkout_bp = Blueprint('checkout', __name__, url_prefix='/api/checkout')
 
 def generate_transaction_number():
     """Generate unique transaction number"""
-    timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+    timestamp = datetime.now(timezone.utc).replace(tzinfo=None).strftime('%Y%m%d%H%M%S')
     return f"TXN-{timestamp}"
 
 
@@ -73,7 +73,7 @@ def process_checkout():
         
         # Add transaction items
         for cart_item in cart['items']:
-            product = Product.query.get(cart_item['product_id'])
+            product = db.session.get(Product, cart_item['product_id'])
             
             # Final stock check
             if not product.is_in_stock(cart_item['quantity']):
@@ -116,11 +116,11 @@ def process_checkout():
         transaction.payment_reference = payment_result['reference']
         transaction.amount_paid = payment_result.get('amount_paid', total_amount)
         transaction.change_given = payment_result.get('change', 0)
-        transaction.completed_at = datetime.utcnow()
+        transaction.completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
         
         # Update inventory
         for cart_item in cart['items']:
-            product = Product.query.get(cart_item['product_id'])
+            product = db.session.get(Product, cart_item['product_id'])
             old_quantity = product.stock_quantity
             product.update_stock(-cart_item['quantity'])
             
@@ -189,7 +189,6 @@ def process_refund():
     """
     try:
         user_id = int(get_jwt_identity())
-        claims = get_jwt()
         data = request.get_json()
         
         transaction_id = data.get('transaction_id')
@@ -209,7 +208,7 @@ def process_refund():
             return jsonify({'error': 'Invalid manager PIN or insufficient privileges'}), 403
         
         # Get original transaction
-        original_transaction = Transaction.query.get(transaction_id)
+        original_transaction = db.session.get(Transaction, transaction_id)
         
         if not original_transaction:
             return jsonify({'error': 'Transaction not found'}), 404
@@ -236,7 +235,7 @@ def process_refund():
             payment_method=original_transaction.payment_method,
             refund_reason=reason,
             authorized_by=manager.id,
-            completed_at=datetime.utcnow()
+            completed_at=datetime.now(timezone.utc).replace(tzinfo=None)
         )
         
         db.session.add(refund_transaction)
@@ -257,7 +256,7 @@ def process_refund():
             db.session.add(refund_item)
             
             # Restore stock
-            product = Product.query.get(original_item.product_id)
+            product = db.session.get(Product, original_item.product_id)
             old_quantity = product.stock_quantity
             product.update_stock(original_item.quantity)
             
@@ -345,7 +344,7 @@ def void_transaction():
             return jsonify({'error': 'Invalid manager PIN or insufficient privileges'}), 403
         
         # Get transaction
-        transaction = Transaction.query.get(transaction_id)
+        transaction = db.session.get(Transaction, transaction_id)
         
         if not transaction:
             return jsonify({'error': 'Transaction not found'}), 404
@@ -353,15 +352,18 @@ def void_transaction():
         if transaction.status == 'voided':
             return jsonify({'error': 'Transaction is already voided'}), 400
         
+        # Store previous status to check for inventory restoration
+        previous_status = transaction.status
+        
         # Void transaction
         transaction.status = 'voided'
         transaction.refund_reason = reason
         transaction.authorized_by = manager.id
         
         # Restore inventory if transaction was completed
-        if transaction.status == 'completed':
+        if previous_status == 'completed':
             for item in transaction.items:
-                product = Product.query.get(item.product_id)
+                product = db.session.get(Product, item.product_id)
                 old_quantity = product.stock_quantity
                 product.update_stock(item.quantity)
                 

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from datetime import datetime
-from models.user import db, User
+from datetime import datetime, timezone
+from models.user import db
 from models.product import Product
 from models.transaction import Transaction, TransactionItem
 from models.refund import Refund
@@ -13,7 +13,7 @@ refund_bp = Blueprint('refund', __name__, url_prefix='/api/refunds')
 
 def generate_refund_number():
     """Generate unique refund number"""
-    timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S')
+    timestamp = datetime.now(timezone.utc).replace(tzinfo=None).strftime('%Y%m%d%H%M%S')
     return f"REF-{timestamp}"
 
 
@@ -93,7 +93,7 @@ def get_refund(refund_id):
         if not has_permission(user_role, 'refund'):
             return jsonify({'error': 'Insufficient permissions'}), 403
         
-        refund = Refund.query.get(refund_id)
+        refund = db.session.get(Refund, refund_id)
         
         if not refund:
             return jsonify({'error': 'Refund not found'}), 404
@@ -134,7 +134,7 @@ def create_refund(transaction_id):
         items_to_refund = data.get('items', [])  # For partial refunds
         
         # Get transaction
-        transaction = Transaction.query.get(transaction_id)
+        transaction = db.session.get(Transaction, transaction_id)
         
         if not transaction:
             return jsonify({'error': 'Transaction not found'}), 404
@@ -185,14 +185,14 @@ def create_refund(transaction_id):
                     item_id = item_data.get('item_id')
                     quantity = item_data.get('quantity', 0)
                     
-                    transaction_item = TransactionItem.query.get(item_id)
+                    transaction_item = db.session.get(TransactionItem, item_id)
                     if not transaction_item or transaction_item.transaction_id != transaction_id:
                         raise ValueError(f'Invalid transaction item: {item_id}')
                     
                     if quantity > transaction_item.quantity:
                         raise ValueError(f'Refund quantity exceeds original quantity for item {item_id}')
                     
-                    product = Product.query.get(transaction_item.product_id)
+                    product = db.session.get(Product, transaction_item.product_id)
                     if product:
                         old_qty = product.stock_quantity
                         product.stock_quantity += quantity
@@ -213,7 +213,7 @@ def create_refund(transaction_id):
             else:
                 # Full refund - restock all items
                 for transaction_item in transaction.items:
-                    product = Product.query.get(transaction_item.product_id)
+                    product = db.session.get(Product, transaction_item.product_id)
                     if product:
                         old_qty = product.stock_quantity
                         product.stock_quantity += transaction_item.quantity
@@ -234,7 +234,7 @@ def create_refund(transaction_id):
             
             # Update refund status
             refund.status = 'completed'
-            refund.completed_at = datetime.utcnow()
+            refund.completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
             
             # Update transaction status if fully refunded
             if total_refunded + amount_cents >= transaction_total_cents:
@@ -286,7 +286,7 @@ def cancel_refund(refund_id):
         if user_role != 'administrator':
             return jsonify({'error': 'Insufficient permissions. Administrator role required.'}), 403
         
-        refund = Refund.query.get(refund_id)
+        refund = db.session.get(Refund, refund_id)
         
         if not refund:
             return jsonify({'error': 'Refund not found'}), 404
